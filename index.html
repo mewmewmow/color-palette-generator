@@ -1,0 +1,11 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Color Palette Generator</title>
+<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,sans-serif;background:#111;color:#fff;min-height:100vh;padding:40px 20px}h1{text-align:center;margin-bottom:30px;font-size:2rem}
+.palette{display:flex;max-width:900px;margin:0 auto 30px;height:200px;border-radius:16px;overflow:hidden;cursor:pointer}.color{flex:1;display:flex;align-items:flex-end;justify-content:center;padding-bottom:15px;font-size:0.85rem;font-weight:600;transition:transform .2s}
+.color:hover{transform:scaleY(1.05)}.btn{display:block;margin:0 auto;background:#fff;color:#111;border:none;padding:12px 30px;border-radius:8px;font-size:1rem;cursor:pointer}
+.btn:hover{background:#ddd}.copied{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#22c55e;color:#fff;padding:10px 20px;border-radius:8px;display:none}</style></head>
+<body><h1>🎨 Color Palette Generator</h1><div class="palette" id="palette"></div><button class="btn" onclick="generate()">Generate New Palette</button><div class="copied" id="copied">Copied!</div>
+<script>const P=document.getElementById('palette');function r(){return Math.floor(Math.random()*256)}
+function h(r,g,b){return'#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('')}
+function generate(){P.innerHTML='';for(let i=0;i<5;i++){const c=h(r(),r(),r());const d=document.createElement('div');d.className='color';d.style.background=c;d.textContent=c;d.style.color=parseInt(c.slice(1),16)>0x888888?'#000':'#fff';
+d.onclick=()=>{navigator.clipboard.writeText(c);document.getElementById('copied').style.display='block';setTimeout(()=>document.getElementById('copied').style.display='none',1500)};P.appendChild(d)}}
+generate()</script></body></html>
