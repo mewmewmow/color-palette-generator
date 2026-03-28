@@ -1,11 +1,132 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Color Palette Generator</title>
-<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,sans-serif;background:#111;color:#fff;min-height:100vh;padding:40px 20px}h1{text-align:center;margin-bottom:30px;font-size:2rem}
-.palette{display:flex;max-width:900px;margin:0 auto 30px;height:200px;border-radius:16px;overflow:hidden;cursor:pointer}.color{flex:1;display:flex;align-items:flex-end;justify-content:center;padding-bottom:15px;font-size:0.85rem;font-weight:600;transition:transform .2s}
-.color:hover{transform:scaleY(1.05)}.btn{display:block;margin:0 auto;background:#fff;color:#111;border:none;padding:12px 30px;border-radius:8px;font-size:1rem;cursor:pointer}
-.btn:hover{background:#ddd}.copied{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#22c55e;color:#fff;padding:10px 20px;border-radius:8px;display:none}</style></head>
-<body><h1>🎨 Color Palette Generator</h1><div class="palette" id="palette"></div><button class="btn" onclick="generate()">Generate New Palette</button><div class="copied" id="copied">Copied!</div>
-<script>const P=document.getElementById('palette');function r(){return Math.floor(Math.random()*256)}
-function h(r,g,b){return'#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('')}
-function generate(){P.innerHTML='';for(let i=0;i<5;i++){const c=h(r(),r(),r());const d=document.createElement('div');d.className='color';d.style.background=c;d.textContent=c;d.style.color=parseInt(c.slice(1),16)>0x888888?'#000':'#fff';
-d.onclick=()=>{navigator.clipboard.writeText(c);document.getElementById('copied').style.display='block';setTimeout(()=>document.getElementById('copied').style.display='none',1500)};P.appendChild(d)}}
-generate()</script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Color Palette Generator | Isaac's Toolkit</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f0f0f;--panel:#1a1a1a;--border:#2a2a2a;--text:#eaeaea;--dim:#888;--accent:#00ff9f;--glow:rgba(0,255,159,.2);--font:'JetBrains Mono',monospace;--radius:8px}
+html{font-family:var(--font);background:var(--bg);color:var(--text);font-size:15px}
+body{min-height:100vh;display:flex;flex-direction:column}
+
+.topbar{position:sticky;top:0;z-index:50;background:rgba(15,15,15,.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);padding:10px 20px;display:flex;align-items:center;justify-content:space-between}
+.topbar-title{font-size:.85rem;font-weight:600}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.version{font-size:.62rem;padding:2px 7px;border-radius:4px;background:rgba(0,255,159,.08);border:1px solid rgba(0,255,159,.2);color:var(--accent)}
+.nav-link{font-size:.72rem;color:var(--dim);text-decoration:none;transition:color .2s}
+.nav-link:hover{color:var(--accent)}
+
+.container{max-width:900px;margin:0 auto;padding:32px 24px;flex:1}
+.section-tag{font-size:.65rem;color:var(--accent);text-transform:uppercase;letter-spacing:3px;margin-bottom:5px}
+.title{font-size:1.3rem;font-weight:700;margin-bottom:3px}
+.subtitle{font-size:.78rem;color:var(--dim);margin-bottom:16px}
+.line{width:28px;height:2px;background:var(--accent);margin-bottom:20px}
+
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:22px;transition:border-color .3s,box-shadow .3s}
+.panel:hover{border-color:rgba(0,255,159,.25);box-shadow:0 0 16px var(--glow)}
+
+.palette{display:flex;max-width:100%;margin:0 auto 20px;height:180px;border-radius:var(--radius);overflow:hidden;cursor:pointer;border:1px solid var(--border)}
+.color{flex:1;display:flex;align-items:flex-end;justify-content:center;padding-bottom:14px;font-size:.75rem;font-weight:600;font-family:var(--font);transition:transform .2s}
+.color:hover{transform:scaleY(1.05)}
+
+.btn{display:inline-flex;align-items:center;gap:6px;font-family:var(--font);font-size:.75rem;font-weight:500;padding:9px 16px;border-radius:var(--radius);border:1px solid var(--border);background:var(--bg);color:var(--text);cursor:pointer;transition:all .2s}
+.btn:hover{border-color:var(--accent);color:var(--accent);box-shadow:0 0 10px var(--glow)}
+.btn-primary{background:rgba(0,255,159,.08);border-color:rgba(0,255,159,.25);color:var(--accent)}
+.btn-group{display:flex;gap:8px;flex-wrap:wrap}
+
+.output{background:#0a0a0a;border:1px solid var(--border);border-radius:var(--radius);padding:14px;font-size:.78rem;line-height:1.6;word-break:break-all}
+.output-bar{font-size:.68rem;color:var(--dim);margin-bottom:5px}
+
+.toast{position:fixed;bottom:20px;right:20px;z-index:999;background:var(--panel);border:1px solid var(--accent);border-radius:var(--radius);padding:10px 18px;font-size:.78rem;color:var(--accent);box-shadow:0 0 16px var(--glow);transform:translateY(80px);opacity:0;transition:all .3s}
+.toast.show{transform:translateY(0);opacity:1}
+
+footer{text-align:center;padding:28px 0;border-top:1px solid var(--border);font-size:.68rem;color:var(--dim)}
+@media(max-width:768px){.palette{height:120px}.container{padding:20px 14px}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+<div class="topbar-title">🎨 Color Palette Generator</div>
+<div class="topbar-right">
+<a href="https://mewmewmow.github.io/Portfolio/" class="nav-link">← Dashboard</a>
+<span class="version">v1.0.0</span>
+</div>
+</div>
+
+<div class="container">
+<div class="section-tag">Tool //</div>
+<h1 class="title">Color Palette Generator</h1>
+<p class="subtitle">Generate beautiful color palettes. Click any color to copy.</p>
+<div class="line"></div>
+
+<div class="panel">
+<div class="palette" id="palette"></div>
+<div class="btn-group" style="margin-bottom:16px">
+<button class="btn btn-primary" onclick="generate()">🔄 Generate New</button>
+<button class="btn" onclick="copyAll()">📋 Copy All</button>
+</div>
+<div>
+<div class="output-bar"><span>Hex Codes</span></div>
+<div class="output" id="hexOutput">Click Generate to create a palette</div>
+</div>
+</div>
+</div>
+
+<footer>
+<div class="container">Color Palette Generator v1.0.0 · Part of Isaac's Toolkit</div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const a={c:0};
+try{const s=JSON.parse(localStorage.getItem('cp_a'));a.c=s.c||0}catch(e){}
+function track(n){a.c++;localStorage.setItem('cp_a',JSON.stringify(a));console.log('[analytics]',n)}
+
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800)}
+
+function r(){return Math.floor(Math.random()*256)}
+function hex(r,g,b){return'#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('')}
+function isDark(c){return parseInt(c.slice(1),16)<0x888888}
+
+let colors=[];
+
+function generate(){
+track('generate');
+const palette=document.getElementById('palette');
+palette.innerHTML='';
+colors=[];
+
+for(let i=0;i<5;i++){
+const c=hex(r(),r(),r());
+colors.push(c);
+const d=document.createElement('div');
+d.className='color';
+d.style.background=c;
+d.textContent=c;
+d.style.color=isDark(c)?'#fff':'#000';
+d.onclick=()=>{
+navigator.clipboard.writeText(c);
+toast('Copied '+c);
+track('copy_color');
+};
+palette.appendChild(d);
+}
+
+document.getElementById('hexOutput').textContent=colors.join(' | ');
+}
+
+function copyAll(){
+track('copy_all');
+navigator.clipboard.writeText(colors.join(', '));
+toast('All colors copied!');
+}
+
+generate();
+</script>
+
+</body>
+</html>
